@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  sso-server:
+    build: server
+    environment:
+      VIRTUAL_HOST: sso-server.test
+      VIRTUAL_PORT: 3000
+    volumes:
+      - ./server/:/home/node/app
+
+  sso-client1:
+    build: client1
+    environment:
+      VIRTUAL_HOST: sso-client1.test
+      VIRTUAL_PORT: 3000
+    volumes:
+      - ./client1/:/home/node/app
+
+  adminer:
+    image: adminer:4.8.1
+    environment:
+      VIRTUAL_HOST: adminer.test
+
+  whoami:
+    image: jwilder/whoami
+    environment:
+      VIRTUAL_HOST: whoami.test
+
+
+  nginx-proxy: 
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./certs:/etc/nginx/certs:ro
